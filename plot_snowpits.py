@@ -7,6 +7,7 @@ plt.close('all')
 plt.style.use('seaborn-v0_8')
 
 b_print = False
+b_snow_depth = False
 
 src = os.environ['HOME'] + '/bwSyncShare/Data/2024-Snow_sampling/2024-snow_sampling.ods'
 
@@ -28,15 +29,21 @@ max_depth = (int(data['0418-broe']['Depth'][0][:3]),
 fig1, axs = plt.subplots(1,1)
 axt = axs.twiny()
 
-axs.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, color='grey')
-axt.plot(data['0418-broe']['Temperature (°C)'][1:], data['0418-broe']['Depth (cm)'][1:], color=colors[0], label=locations[0])
-axt.plot(data['0427-alov']['Temperature'][2:], data['0427-alov']['Depth'][2:], color=colors[2], ls='--', label=locations[2])
+axs.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, color='grey', marker='o')
+axs.plot(data['0423-gruv']['Density (g)'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, ls=':', color='grey', marker='s')
+axt.plot(data['0418-broe']['Temperature (°C)'][1:], data['0418-broe']['Depth (cm)'][1:], color=colors[0], marker='o', label=locations[0])
+axt.plot(data['0423-gruv']['Temp (degC)'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, color=colors[1], ls=':', marker='s', label=locations[1])
+axt.plot(data['0427-alov']['Temperature'][2:], data['0427-alov']['Depth'][2:], color=colors[2], ls='--', marker='^', label=locations[2])
 axs.set_xlabel('$\\rho$ ($\mathrm{kg m^{-3}}$)', size=16, color='grey')
-axs.set_ylabel('Snow height ($\mathrm{cm}$)', size=16)
+if b_snow_depth:
+    axs.set_ylabel('Snow depth ($\mathrm{cm}$)', size=16)
+    axs.invert_yaxis()
+else:
+    axs.set_ylabel('Snow height ($\mathrm{cm}$)', size=16)
 axs.tick_params(axis='both', which='major', labelsize=14)
 axs.tick_params(axis='x', colors='grey')
 axt.set_xlabel('T ($\mathrm{^\circ C}$)', size=16)
-axt.set_xlim(-13,0)
+axt.set_xlim(-13,0.5)
 axt.grid(False)
 axt.tick_params(axis='both', which='major', labelsize=14)
 
@@ -56,8 +63,11 @@ axs2.plot(data['0427-alov']['Br- estimate from plot'][1:],
           np.concatenate(((pd.eval(data['0427-alov']['Depth'][1])*0.5,), (max_depth[2]-data['0427-alov']['Depth'][2:]).to_list())), ls=':', marker='^', color=colors[2], label=locations[2])
 
 axs2.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
-axs2.set_ylabel('Depth ($\mathrm{cm}$)', size=16)
-axs2.invert_yaxis()
+if b_snow_depth:
+    axs2.set_ylabel('Snow depth ($\mathrm{cm}$)', size=16)
+    axs2.invert_yaxis()
+else:
+    axs2.set_ylabel('Snow height ($\mathrm{cm}$)', size=16)
 axs2.tick_params(axis='both', which='major', labelsize=14)
 
 if b_print:
