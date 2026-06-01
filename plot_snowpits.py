@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 plt.close('all')
 plt.style.use('seaborn-v0_8')
 
-b_print = False
+b_print = True
 b_snow_depth = False
 
 src = os.environ['HOME'] + '/bwSyncShare/Data/2024-Snow_sampling/2024-snow_sampling.ods'
@@ -18,8 +18,9 @@ data = {}
 for each, ihead in zip(sheets,(4,8,10)):
     data.update({each:pd.read_excel(src, sheet_name=each, header=ihead,)})
 
-kg = 1e3
-cm3 = (1e2)**3
+kg = 1e3 #[g]
+cm3 = (1e2)**3 # [m3]
+snow_probe_vol = 10*10*10*0.5 # l x w x h * 0.5 [cm3] volume of snow probe used at gruvebadet
 max_depth = (int(data['0418-broe']['Depth'][0][:3]),
              data['0423-gruv']['Depth from'][0],
              int(data['0427-alov']['Depth'][1][:3]))
@@ -30,7 +31,7 @@ fig1, axs = plt.subplots(1,1)
 axt = axs.twiny()
 
 axs.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, color='grey', marker='o')
-axs.plot(data['0423-gruv']['Density (g)'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, ls=':', color='grey', marker='s')
+axs.plot(data['0423-gruv']['Mass (g)']/snow_probe_vol/kg*cm3, (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, ls=':', color='grey', marker='s')
 axt.plot(data['0418-broe']['Temperature (°C)'][1:], data['0418-broe']['Depth (cm)'][1:], color=colors[0], marker='o', label=locations[0])
 axt.plot(data['0423-gruv']['Temp (degC)'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, color=colors[1], ls=':', marker='s', label=locations[1])
 axt.plot(data['0427-alov']['Temperature'][2:], data['0427-alov']['Depth'][2:], color=colors[2], ls='--', marker='^', label=locations[2])
@@ -57,10 +58,10 @@ plt.tight_layout()
 fig2, axs2 = plt.subplots(1,1)
 
 axs2.plot(data['0418-broe']['Br- (µmol/L) estimate from plot'], 
-          np.concatenate(((pd.eval(data['0418-broe']['Depth'][0])*0.5,), (max_depth[0]-data['0418-broe']['Depth'][1:]).to_list())), color=colors[0], ls=':', marker='o', label=locations[0])
+          np.concatenate(((pd.eval(data['0418-broe']['Depth'][0])*0.5,), (max_depth[0]-data['0418-broe']['Depth'][1:]).to_list())), color=colors[0], ls='-', marker='o', label=locations[0])
 axs2.plot(data['0423-gruv']['Br- (µmol/L) estimate from plot'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, color=colors[1], ls=':', marker='s', label=locations[1])
 axs2.plot(data['0427-alov']['Br- estimate from plot'][1:], 
-          np.concatenate(((pd.eval(data['0427-alov']['Depth'][1])*0.5,), (max_depth[2]-data['0427-alov']['Depth'][2:]).to_list())), ls=':', marker='^', color=colors[2], label=locations[2])
+          np.concatenate(((pd.eval(data['0427-alov']['Depth'][1])*0.5,), (max_depth[2]-data['0427-alov']['Depth'][2:]).to_list())), ls='--', marker='^', color=colors[2], label=locations[2])
 
 axs2.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
 if b_snow_depth:
