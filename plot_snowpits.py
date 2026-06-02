@@ -26,55 +26,85 @@ max_depth = (int(data['0418-broe']['Depth'][0][:3]),
              int(data['0427-alov']['Depth'][1][:3]))
 
 # Plot it
-# Density/Temperature
-fig1, axs = plt.subplots(1,1)
-axt = axs.twiny()
+# Density
+fig1, axd = plt.subplots(1,1)
 
-axs.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, color='grey', marker='o')
-axs.plot(data['0423-gruv']['Mass (g)']/snow_probe_vol/kg*cm3, (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, ls=':', color='grey', marker='s')
-axt.plot(data['0418-broe']['Temperature (°C)'][1:], data['0418-broe']['Depth (cm)'][1:], color=colors[0], marker='o', label=locations[0])
-axt.plot(data['0423-gruv']['Temp (degC)'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, color=colors[1], ls=':', marker='s', label=locations[1])
-axt.plot(data['0427-alov']['Temperature'][2:], data['0427-alov']['Depth'][2:], color=colors[2], ls='--', marker='^', label=locations[2])
-axs.set_xlabel('$\\rho$ ($\mathrm{kg m^{-3}}$)', size=16, color='grey')
-if b_snow_depth:
-    axs.set_ylabel('Snow depth ($\mathrm{cm}$)', size=16)
-    axs.invert_yaxis()
-else:
-    axs.set_ylabel('Snow height ($\mathrm{cm}$)', size=16)
-axs.tick_params(axis='both', which='major', labelsize=14)
-axs.tick_params(axis='x', colors='grey')
+# ABB
+axd.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, 
+         data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, 
+         color=colors[0], marker='o', label=locations[0])
+# G
+axd.plot(data['0423-gruv']['Mass (g)']/snow_probe_vol/kg*cm3, 
+         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, 
+         ls=':', color=colors[1], marker='s', label=locations[1])
+# Indicate ground
+ymin = axd.get_ylim()[0].round()
+axd.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
+# Set axes
+axd.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axd.set_ylim(ymin,)
+axd.tick_params(axis='both', which='major', labelsize=14)
+axd.set_xlabel('$\\rho$ ($\mathrm{kg m^{-3}}$)', size=16)
+if b_print:
+    axd.set_title('(a)', loc='left', x=-0.1, y=1, size=20)
+
+axd.legend(fontsize=12)
+plt.tight_layout()
+
+# Temperature
+fig1, axt = plt.subplots(1,1)
+# ABB
+axt.plot(data['0418-broe']['Temperature (°C)'][1:], 
+         data['0418-broe']['Depth (cm)'][1:], 
+         color=colors[0], marker='o', label=locations[0])
+# G
+axt.plot(data['0423-gruv']['Temp (degC)'], 
+         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, 
+         color=colors[1], ls=':', marker='s', label=locations[1])
+# ALB
+axt.plot(data['0427-alov']['Temperature'][2:], 
+         data['0427-alov']['Depth'][2:], 
+         color=colors[2], ls='--', marker='^', label=locations[2])
+
+
+# Temperature axis
+# Indicate ground
+axt.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
+# Set axes
+axt.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axt.set_ylim(ymin,)
+axt.tick_params(axis='both', which='major', labelsize=14)
 axt.set_xlabel('T ($\mathrm{^\circ C}$)', size=16)
 axt.set_xlim(-13,0.5)
-axt.grid(False)
-axt.tick_params(axis='both', which='major', labelsize=14)
-
 if b_print:
-    axs.set_title('(a)', loc='left', x=-0.1, y=1, size=20)
-
+    axt.set_title('(b)', loc='left', x=-0.1, y=1, size=20)
 axt.legend(fontsize=12)
 plt.tight_layout()
 
 # Bromide
-fig2, axs2 = plt.subplots(1,1)
+fig3, axb = plt.subplots(1,1)
 
-axs2.plot(data['0418-broe']['Br- (µmol/L) estimate from plot'], 
-          np.concatenate(((pd.eval(data['0418-broe']['Depth'][0])*0.5,), (max_depth[0]-data['0418-broe']['Depth'][1:]).to_list())), color=colors[0], ls='-', marker='o', label=locations[0])
-axs2.plot(data['0423-gruv']['Br- (µmol/L) estimate from plot'], (max_depth[1]-data['0423-gruv']['Depth from'])+(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, color=colors[1], ls=':', marker='s', label=locations[1])
-axs2.plot(data['0427-alov']['Br- estimate from plot'][1:], 
-          np.concatenate(((pd.eval(data['0427-alov']['Depth'][1])*0.5,), (max_depth[2]-data['0427-alov']['Depth'][2:]).to_list())), ls='--', marker='^', color=colors[2], label=locations[2])
+axb.plot(data['0418-broe']['Br- (µmol/L) estimate from plot'], 
+          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list())), 
+          color=colors[0], ls='-', marker='o', label=locations[0])
+axb.plot(data['0423-gruv']['Br- (µmol/L) estimate from plot'], 
+         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5,  
+          color=colors[1], ls=':', marker='s', label=locations[1])
+axb.plot(data['0427-alov']['Br- estimate from plot'][1:], 
+          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list())), 
+          ls='--', marker='^', color=colors[2], label=locations[2])
+# Set axes
+# Indicate ground
+axb.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 
-axs2.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
-if b_snow_depth:
-    axs2.set_ylabel('Snow depth ($\mathrm{cm}$)', size=16)
-    axs2.invert_yaxis()
-else:
-    axs2.set_ylabel('Snow height ($\mathrm{cm}$)', size=16)
-axs2.tick_params(axis='both', which='major', labelsize=14)
-
+axb.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
+axb.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axb.tick_params(axis='both', which='major', labelsize=14)
+axb.set_ylim(ymin,)
 if b_print:
-    axs2.set_title('(b)', loc='left', x=-0.1, y=1, size=20)
+    axb.set_title('(c)', loc='left', x=-0.1, y=1, size=20)
 
-axs2.legend(fontsize=12)
+axb.legend(fontsize=12)
 plt.tight_layout()
 
 plt.show(block=False)
@@ -100,5 +130,6 @@ if b_print:
 else:
     postfix='png'
 
-fig1.savefig('./plots/2024-snowpits-temp-dens.%s' % (postfix))
-fig2.savefig('./plots/2024-snowpits-bromide.%s' % (postfix))
+fig1.savefig('./plots/2024-snowpits-dens.%s' % (postfix))
+fig1.savefig('./plots/2024-snowpits-temp.%s' % (postfix))
+fig3.savefig('./plots/2024-snowpits-bromide.%s' % (postfix))
