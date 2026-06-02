@@ -52,7 +52,7 @@ axd.legend(fontsize=12)
 plt.tight_layout()
 
 # Temperature
-fig1, axt = plt.subplots(1,1)
+fig2, axt = plt.subplots(1,1)
 # ABB
 axt.plot(data['0418-broe']['Temperature (°C)'][1:], 
          data['0418-broe']['Depth (cm)'][1:], 
@@ -131,5 +131,5 @@ else:
     postfix='png'
 
 fig1.savefig('./plots/2024-snowpits-dens.%s' % (postfix))
-fig1.savefig('./plots/2024-snowpits-temp.%s' % (postfix))
+fig2.savefig('./plots/2024-snowpits-temp.%s' % (postfix))
 fig3.savefig('./plots/2024-snowpits-bromide.%s' % (postfix))
