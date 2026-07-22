@@ -107,6 +107,33 @@ if b_print:
 axb.legend(fontsize=12)
 plt.tight_layout()
 
+# Bromide enhancement
+fig4, axbh = plt.subplots(1,1)
+
+axbh.plot(data['0418-broe']['nss-Br-/Br- estimate from plot'], 
+          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list())), 
+          color=colors[0], ls='-', marker='o', label=locations[0])
+axbh.plot(data['0423-gruv']['nss-Br-/Br- estimate from plot'], 
+         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5,  
+          color=colors[1], ls=':', marker='s', label=locations[1])
+axbh.plot(data['0427-alov']['nss-Br-/Br- estimate from plot'][1:], 
+          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list())), 
+          ls='--', marker='^', color=colors[2], label=locations[2])
+# Set axes
+# Indicate ground
+axbh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
+
+axbh.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
+axbh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axbh.tick_params(axis='both', which='major', labelsize=14)
+axbh.set_ylim(ymin,)
+if b_print:
+    axbh.set_title('', loc='left', x=-0.1, y=1, size=20)
+
+axbh.legend(fontsize=12)
+plt.tight_layout()
+
+
 plt.show(block=False)
 
 print("Background [Br-] (µmol/L) - mean - std")
@@ -133,3 +160,4 @@ else:
 fig1.savefig('./plots/2024-snowpits-dens.%s' % (postfix))
 fig2.savefig('./plots/2024-snowpits-temp.%s' % (postfix))
 fig3.savefig('./plots/2024-snowpits-bromide.%s' % (postfix))
+fig4.savefig('./plots/2024-snowpits-bromide_enhancement.%s' % (postfix))
