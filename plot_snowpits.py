@@ -123,7 +123,7 @@ axbh.plot(data['0427-alov']['nss-Br-/Br- estimate from plot'][1:],
 # Indicate ground
 axbh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 
-axbh.set_xlabel('$\mathrm{[Br^-]}$ ($\mathrm{\mu mol L^{-1}}$)', size=16)
+axbh.set_xlabel('$\\frac{\mathrm{[Br^--nss]}}{\mathrm{[Br^-]}}$', size=16)
 axbh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
 axbh.tick_params(axis='both', which='major', labelsize=14)
 axbh.set_ylim(ymin,)
