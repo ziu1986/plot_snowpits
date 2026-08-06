@@ -20,7 +20,7 @@ for each, ihead in zip(sheets,(4,8,10)):
 
 kg = 1e3 #[g]
 cm3 = (1e2)**3 # [m3]
-snow_probe_vol = 10*10*10*0.5 # l x w x h * 0.5 [cm3] volume of snow probe used at gruvebadet
+snow_density = (data['0423-gruv']['Mass (g)']-141)*10 # mass -> density
 max_depth = (int(data['0418-broe']['Depth'][0][:3]),
              data['0423-gruv']['Depth from'][0],
              int(data['0427-alov']['Depth'][1][:3]))
@@ -34,7 +34,7 @@ axd.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3,
          data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, 
          color=colors[0], marker='o', label=locations[0])
 # G
-axd.plot(data['0423-gruv']['Mass (g)']/snow_probe_vol/kg*cm3, 
+axd.plot(snow_density, 
          (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, 
          ls=':', color=colors[1], marker='s', label=locations[1])
 # Indicate ground
