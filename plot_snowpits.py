@@ -128,12 +128,40 @@ axbh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
 axbh.tick_params(axis='both', which='major', labelsize=14)
 axbh.set_ylim(ymin,)
 if b_print:
-    axbh.set_title('', loc='left', x=-0.1, y=1, size=20)
+    axbh.set_title('(a)', loc='left', x=-0.1, y=1, size=20)
 
 axbh.legend(fontsize=12)
 plt.tight_layout()
 
+# Bromide enhancement relative height
+fig5, axbhh = plt.subplots(1,1)
 
+axbhh.plot(data['0418-broe']['nss-Br-/Br- estimate from plot'], 
+          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list()))/max_depth[0], 
+          color=colors[0], ls='-', marker='o', label=locations[0])
+axbhh.plot(data['0423-gruv']['nss-Br-/Br- estimate from plot'], 
+         ((data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5)/max_depth[1],  
+          color=colors[1], ls=':', marker='s', label=locations[1])
+axbhh.plot(data['0427-alov']['nss-Br-/Br- estimate from plot'][1:], 
+          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list()))/max_depth[2], 
+          ls='--', marker='^', color=colors[2], label=locations[2])
+# Set axes
+# Indicate ground
+ymin = -0.01
+axbhh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
+
+axbhh.set_xlabel('$\\frac{\mathrm{[Br^--nss]}}{\mathrm{[Br^-]}}$', size=16)
+axbhh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axbhh.tick_params(axis='both', which='major', labelsize=14)
+axbhh.set_ylim(ymin,)
+axbhh.axvline(0, color='white', lw=3, zorder=0)
+if b_print:
+    axbhh.set_title('(b)', loc='left', x=-0.1, y=1, size=20)
+
+axbhh.legend(fontsize=12)
+plt.tight_layout()
+
+# Show it
 plt.show(block=False)
 
 print("Background [Br-] (µmol/L) - mean - std")
@@ -161,3 +189,4 @@ fig1.savefig('./plots/2024-snowpits-dens.%s' % (postfix))
 fig2.savefig('./plots/2024-snowpits-temp.%s' % (postfix))
 fig3.savefig('./plots/2024-snowpits-bromide.%s' % (postfix))
 fig4.savefig('./plots/2024-snowpits-bromide_enhancement.%s' % (postfix))
+fig5.savefig('./plots/2024-snowpits-bromide_enhancement_rel_height.%s' % (postfix))
