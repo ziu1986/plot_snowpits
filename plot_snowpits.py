@@ -151,7 +151,7 @@ ymin = -0.01
 axbhh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 
 axbhh.set_xlabel('$\\frac{\mathrm{[Br^--nss]}}{\mathrm{[Br^-]}}$', size=16)
-axbhh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
+axbhh.set_ylabel('$\\frac{\mathrm{h}}{\mathrm{h_{max}}}$', size=16)
 axbhh.tick_params(axis='both', which='major', labelsize=14)
 axbhh.set_ylim(ymin,)
 axbhh.axvline(0, color='white', lw=3, zorder=0)
