@@ -11,9 +11,12 @@ b_snow_depth = False
 
 src = os.environ['HOME'] + '/bwSyncShare/Data/2024-Snow_sampling/2024-snow_sampling.ods'
 
-colors = ('#cf524e', 'steelblue', '#B8860B')
 locations = ('Austre Brøggerbreen', 'Gruvebadet', 'Austre Lovénbreen')
 sheets = ('0418-broe', '0423-gruv', '0427-alov')
+colors = ('#cf524e', 'steelblue', '#B8860B')
+markers = ('o', 's', '^')
+lines = ('-', '--', ':')
+# Read data from sheets
 data = {}
 for each, ihead in zip(sheets,(4,8,10)):
     data.update({each:pd.read_excel(src, sheet_name=each, header=ihead,)})
@@ -25,18 +28,21 @@ max_depth = (int(data['0418-broe']['Depth'][0][:3]),
              data['0423-gruv']['Depth from'][0],
              int(data['0427-alov']['Depth'][1][:3]))
 
+# Data to plot
+depth = (np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list())), (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list())))
+
+bromide = (data['0418-broe']['Br- (µmol/L) estimate from plot'], data['0423-gruv']['Br- (µmol/L) estimate from plot'], data['0427-alov']['Br- estimate from plot'][1:])
+rel_bromide = (data['0418-broe']['nss-Br-/Br- estimate from plot'], data['0423-gruv']['nss-Br-/Br- estimate from plot'], data['0427-alov']['nss-Br-/Br- estimate from plot'][1:])
+
 # Plot it
 # Density
 fig1, axd = plt.subplots(1,1)
 
-# ABB
-axd.plot(data['0418-broe']['Density (g/cm3)']/kg*cm3, 
-         data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, 
-         color=colors[0], marker='o', label=locations[0])
-# G
-axd.plot(snow_density, 
-         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, 
-         ls=':', color=colors[1], marker='s', label=locations[1])
+for i, ixdata, iydata in zip(np.arange(0,2), (data['0418-broe']['Density (g/cm3)']/kg*cm3, snow_density), 
+                             (data['0418-broe']['Depth from (cm)']-(data['0418-broe']['Depth from (cm)']-data['0418-broe']['Depth to (cm)'])*0.5, (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5)):
+    axd.plot(ixdata, iydata,
+         color=colors[i], ls=lines[i], marker=markers[i], label=locations[i])
+
 # Indicate ground
 ymin = axd.get_ylim()[0].round()
 axd.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
@@ -53,21 +59,13 @@ plt.tight_layout()
 
 # Temperature
 fig2, axt = plt.subplots(1,1)
-# ABB
-axt.plot(data['0418-broe']['Temperature (°C)'][1:], 
-         data['0418-broe']['Depth (cm)'][1:], 
-         color=colors[0], marker='o', label=locations[0])
-# G
-axt.plot(data['0423-gruv']['Temp (degC)'], 
-         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, 
-         color=colors[1], ls=':', marker='s', label=locations[1])
-# ALB
-axt.plot(data['0427-alov']['Temperature'][2:], 
-         data['0427-alov']['Depth'][2:], 
-         color=colors[2], ls='--', marker='^', label=locations[2])
 
+for i, ixdata, iydata in zip(np.arange(0,2), 
+                             (data['0418-broe']['Temperature (°C)'][1:], data['0423-gruv']['Temp (degC)'], data['0427-alov']['Temperature'][2:]), 
+                             (data['0418-broe']['Depth (cm)'][1:], (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5, data['0427-alov']['Depth'][2:])):
+    axt.plot(ixdata, iydata,
+             color=colors[i], ls=lines[i], marker=markers[i], label=locations[i])
 
-# Temperature axis
 # Indicate ground
 axt.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 # Set axes
@@ -83,16 +81,13 @@ plt.tight_layout()
 
 # Bromide
 fig3, axb = plt.subplots(1,1)
+rel_error_x = 0.01
 
-axb.plot(data['0418-broe']['Br- (µmol/L) estimate from plot'], 
-          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list())), 
-          color=colors[0], ls='-', marker='o', label=locations[0])
-axb.plot(data['0423-gruv']['Br- (µmol/L) estimate from plot'], 
-         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5,  
-          color=colors[1], ls=':', marker='s', label=locations[1])
-axb.plot(data['0427-alov']['Br- estimate from plot'][1:], 
-          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list())), 
-          ls='--', marker='^', color=colors[2], label=locations[2])
+for i, ixdata, iydata in zip(np.arange(0,3), bromide, depth):
+    axb.errorbar(ixdata, iydata, 
+          xerr=ixdata*rel_error_x,
+          ecolor=colors[i], color=colors[i], ls=lines[i], marker=markers[i], label=locations[i])
+
 # Set axes
 # Indicate ground
 axb.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
@@ -110,15 +105,11 @@ plt.tight_layout()
 # Bromide enhancement
 fig4, axbh = plt.subplots(1,1)
 
-axbh.plot(data['0418-broe']['nss-Br-/Br- estimate from plot'], 
-          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list())), 
-          color=colors[0], ls='-', marker='o', label=locations[0])
-axbh.plot(data['0423-gruv']['nss-Br-/Br- estimate from plot'], 
-         (data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5,  
-          color=colors[1], ls=':', marker='s', label=locations[1])
-axbh.plot(data['0427-alov']['nss-Br-/Br- estimate from plot'][1:], 
-          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list())), 
-          ls='--', marker='^', color=colors[2], label=locations[2])
+for i, izdata, iydata, ixdata in zip(np.arange(0,3), rel_bromide, depth, bromide):
+    axbh.errorbar(izdata, iydata, 
+          #xerr=((izdata/ixdata**2*rel_error_x)**2+(1/ixdata*rel_error_x)**2)**0.5,
+          ecolor=colors[i], color=colors[i], ls=lines[i], marker=markers[i], label=locations[i])
+
 # Set axes
 # Indicate ground
 axbh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
@@ -136,15 +127,11 @@ plt.tight_layout()
 # Bromide enhancement relative height
 fig5, axbhh = plt.subplots(1,1)
 
-axbhh.plot(data['0418-broe']['nss-Br-/Br- estimate from plot'], 
-          np.concatenate(((max_depth[0]-pd.eval(data['0418-broe']['Depth'][0])*0.5,), (data['0418-broe']['Depth'][1:]).to_list()))/max_depth[0], 
-          color=colors[0], ls='-', marker='o', label=locations[0])
-axbhh.plot(data['0423-gruv']['nss-Br-/Br- estimate from plot'], 
-         ((data['0423-gruv']['Depth from'])-(data['0423-gruv']['Depth from']-data['0423-gruv']['Depth to'])*0.5)/max_depth[1],  
-          color=colors[1], ls=':', marker='s', label=locations[1])
-axbhh.plot(data['0427-alov']['nss-Br-/Br- estimate from plot'][1:], 
-          np.concatenate(((max_depth[2]-pd.eval(data['0427-alov']['Depth'][1])*0.5,), (data['0427-alov']['Depth'][2:]).to_list()))/max_depth[2], 
-          ls='--', marker='^', color=colors[2], label=locations[2])
+for i, izdata, iydata, ixdata, imaxd in zip(np.arange(0,3), rel_bromide, depth, bromide, max_depth):
+    axbhh.errorbar(izdata, iydata/imaxd, 
+          #xerr=((izdata/ixdata**2*rel_error_x)**2+(1/ixdata*rel_error_x)**2)**0.5,
+          ecolor=colors[i], color=colors[i], ls=lines[i], marker=markers[i], label=locations[i])
+
 # Set axes
 # Indicate ground
 ymin = -0.01
