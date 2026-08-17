@@ -102,7 +102,7 @@ if b_print:
 axb.legend(fontsize=12)
 plt.tight_layout()
 
-# Bromide enhancement
+# Relative bromide enhancement
 fig4, axbh = plt.subplots(1,1)
 
 for i, izdata, iydata, ixdata in zip(np.arange(0,3), rel_bromide, depth, bromide):
@@ -114,7 +114,7 @@ for i, izdata, iydata, ixdata in zip(np.arange(0,3), rel_bromide, depth, bromide
 # Indicate ground
 axbh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 
-axbh.set_xlabel('$\\frac{\mathrm{[Br^--nss]}}{\mathrm{[Br^-]}}$', size=16)
+axbh.set_xlabel('$\mathrm{[Br^-]_{rel}^{obs}}$', size=16)
 axbh.set_ylabel('Height ($\mathrm{cm}$)', size=16)
 axbh.tick_params(axis='both', which='major', labelsize=14)
 axbh.set_ylim(ymin,)
@@ -137,8 +137,8 @@ for i, izdata, iydata, ixdata, imaxd in zip(np.arange(0,3), rel_bromide, depth, 
 ymin = -0.01
 axbhh.axhspan(ymin,0, hatch='/', facecolor='none', edgecolor='black')
 
-axbhh.set_xlabel('$\\frac{\mathrm{[Br^--nss]}}{\mathrm{[Br^-]}}$', size=16)
-axbhh.set_ylabel('$\\frac{\mathrm{h}}{\mathrm{h_{max}}}$', size=16)
+axbhh.set_xlabel('$\mathrm{[Br^-]_{rel}^{obs}}$', size=16)
+axbhh.set_ylabel('$\mathrm{h_{rel}}$', size=16)
 axbhh.tick_params(axis='both', which='major', labelsize=14)
 axbhh.set_ylim(ymin,)
 axbhh.axvline(0, color='white', lw=3, zorder=0)
