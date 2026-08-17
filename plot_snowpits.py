@@ -15,7 +15,7 @@ locations = ('Austre Brøggerbreen', 'Gruvebadet', 'Austre Lovénbreen')
 sheets = ('0418-broe', '0423-gruv', '0427-alov')
 colors = ('#cf524e', 'steelblue', '#B8860B')
 markers = ('o', 's', '^')
-lines = ('-', '--', ':')
+lines = ('-', ':', '--')
 # Read data from sheets
 data = {}
 for each, ihead in zip(sheets,(4,8,10)):
